@@ -8,9 +8,45 @@ use std::fs::{self, File};
 use std::path::PathBuf;
 use std::env;
 use std::collections::HashMap;
-use fst::{IntoStreamer, Set};
+use fst::{IntoStreamer, Streamer, Set};
 use fst_levenshtein::Levenshtein;
 use itertools::sorted;
+
+pub struct Dictionary {
+    pub fst: Set,
+    pub occurences: HashMap<String, i32>
+}
+
+impl Dictionary {
+    pub fn new(input_path: &str) -> Dictionary {
+        let files = scan_dir(PathBuf::from(input_path));
+        let occurences: HashMap<String, i32> = files.into_iter()
+            .map(count_words)
+            .filter_map(Result::ok)
+            .fold(HashMap::new(), |mut occs, mut new_occs| {
+                new_occs.drain().for_each(|(key, val)| {
+                    let cur_val = occs.entry(key.to_string()).or_insert(0);
+                    *cur_val += val;
+                });
+                occs
+            });
+        let fst = create_fst_set(&occurences);
+        Dictionary {
+            fst: fst,
+            occurences: occurences
+        }
+    }
+
+    pub fn search(&self, word: &str) -> Vec<String> {
+        let lev = Levenshtein::new(word, 1).expect("Couldn't create test item");
+        self.fst.search(lev).into_stream().into_strs().expect("Couldn't get matches")
+    }
+}
+
+
+fn create_fst_set(occurences: &HashMap<String, i32>) -> Set {
+    Set::from_iter(sorted(occurences.keys())).expect("Couldn't create fst set")
+}
 
 fn scan_dir(base_dir: PathBuf) -> Vec<PathBuf> {
     if base_dir.is_dir() {
@@ -44,34 +80,4 @@ fn count_words<'a>(file_path: PathBuf) -> Result<HashMap<String, i32>, io::Error
         }
     });
     Ok(occurences)
-}
-
-fn create_fst_set(occurences: &HashMap<String, i32>) -> Set {
-    Set::from_iter(sorted(occurences.keys())).expect("Couldn't create fst set")
-}
-
-fn main() {
-    let mut args: Vec<String> = env::args().collect();
-    let test_string: String = args.pop().unwrap();
-    let root_dir: PathBuf = match args.pop() {
-        Some(dir) => PathBuf::from(dir),
-        None => env::current_dir().unwrap(),
-    };
-
-    let all_files = scan_dir(root_dir);
-    let occurences: HashMap<String, i32> = all_files.into_iter()
-            .map(count_words)
-            .filter_map(Result::ok)
-            .fold(HashMap::new(), |mut occs, mut new_occs| {
-                new_occs.drain().for_each(|(key, val)| {
-                    let cur_val = occs.entry(key.to_string()).or_insert(0);
-                    *cur_val += val;
-                });
-                occs
-            });
-
-    let typo_tester = create_fst_set(&occurences);
-    let lev = Levenshtein::new(test_string.as_str(), 1).expect("Couldn't create test item");
-    let matches = typo_tester.search(lev).into_stream().into_strs().expect("Couldn't get matches");
-    matches.into_iter().for_each(|s| println!("{}", s))
 }
