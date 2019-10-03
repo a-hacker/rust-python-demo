@@ -1,4 +1,6 @@
 /target
 **/*.rs.bk
+**/*.so
 
 /venv
+.ipynb_checkpoints
