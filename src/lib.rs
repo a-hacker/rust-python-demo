@@ -6,11 +6,48 @@ use std::io::prelude::*;
 use std::io;
 use std::fs::{self, File};
 use std::path::PathBuf;
-use std::env;
 use std::collections::HashMap;
-use fst::{IntoStreamer, Streamer, Set};
+use fst::{IntoStreamer, Set};
 use fst_levenshtein::Levenshtein;
+use fst_levenshtein::Error as LevError;
 use itertools::sorted;
+use std::error::Error;
+use std::fmt;
+
+#[derive(Debug)]
+pub struct DictionaryError {
+    message: String
+}
+
+impl DictionaryError {
+    fn new(msg: &str) -> DictionaryError {
+        DictionaryError{ message: msg.to_string() }
+    }
+}
+
+impl fmt::Display for DictionaryError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
+impl Error for DictionaryError {
+    fn description(&self) -> &str {
+        &self.message
+    }
+}
+
+impl From<fst::Error> for DictionaryError {
+    fn from(err: fst::Error) -> Self {
+        DictionaryError::new(err.description())
+    }
+}
+
+impl From<LevError> for DictionaryError {
+    fn from(err: LevError) -> Self {
+        DictionaryError::new(err.description())
+    }
+}
 
 pub struct Dictionary {
     pub fst: Set,
@@ -37,9 +74,10 @@ impl Dictionary {
         }
     }
 
-    pub fn search(&self, word: &str) -> Vec<String> {
-        let lev = Levenshtein::new(word, 1).expect("Couldn't create test item");
-        self.fst.search(lev).into_stream().into_strs().expect("Couldn't get matches")
+    pub fn search(&self, word: &str) -> Result<Vec<String>, DictionaryError> {
+        let lev = Levenshtein::new(word, 1)?;
+        let matches = self.fst.search(lev).into_stream().into_strs()?;
+        Ok(matches)
     }
 }
 
