@@ -1,0 +1,16 @@
+[package]
+name = "py_typos"
+version = "0.1.0"
+authors = ["a-hacker <austin.hacker@datarobot.com>"]
+edition = "2018"
+
+[lib]
+name = "py_typos"
+crate-type = ["cdylib"]
+
+[dependencies.pyo3]
+version = "0.8.0"
+features = ["extension-module"]
+
+[dependencies]
+typo_checker = { path = "../typo_checker" }

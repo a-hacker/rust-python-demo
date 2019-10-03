@@ -1,0 +1,20 @@
+[package]
+name = "typo_checker"
+version = "0.1.0"
+authors = ["a-hacker <austin.hacker@datarobot.com>"]
+edition = "2018"
+
+[lib]
+name = "typo_checker"
+path = "src/lib.rs"
+
+[[bin]]
+name = "typo_checker"
+path = "src/bin.rs"
+
+[dependencies]
+regex = "1"
+lazy_static = "1.4.0"
+fst = "0.3"
+fst-levenshtein = "0.2"
+itertools = "0.8.0"
