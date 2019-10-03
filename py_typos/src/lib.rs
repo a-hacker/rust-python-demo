@@ -1,16 +1,35 @@
 use pyo3::prelude::*;
-use pyo3::wrap_pyfunction;
+use pyo3::exceptions;
 
-#[pyfunction]
-/// Formats the sum of two numbers as string
-fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
-    Ok((a + b).to_string())
+use typo_checker::Dictionary;
+
+#[pyclass]
+struct WordProfiler {
+    profiler: Dictionary
 }
 
-/// This module is a python module implemented in Rust.
-#[pymodule]
-fn string_sum(py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_wrapped(wrap_pyfunction!(sum_as_string))?;
+#[pymethods]
+impl WordProfiler {
+    #[new]
+     fn new(obj: &PyRawObject, path: &str) {
+         obj.init({
+             WordProfiler {
+                 profiler: Dictionary::new(path),
+             }
+         });
+     }
 
+     fn search(&self, word: &str) -> PyResult<Vec<String>> {
+         match self.profiler.search(word) {
+             Ok(r) => Ok(r),
+             Err(_e) => Err(exceptions::ValueError::py_err("Failed to search for input string!"))
+         }
+     }
+}
+
+
+#[pymodule]
+fn py_typos(py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_class::<WordProfiler>()?;
     Ok(())
 }
