@@ -26,6 +26,24 @@ h3 {
     color: #0090DC;
 }
 
+.column {
+    float: left;
+    width: 50%;
+    padding: 10px;
+}
+
+.tri-column {
+    float: left;
+    width: 33%;
+    padding: 10px;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
 .controls::before {
     content: '@2019 DataRobot, Inc. - All rights reserved   ';
     color: gray
