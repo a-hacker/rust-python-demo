@@ -1,0 +1,32 @@
+.notebook_app {
+    background-color: #fff;
+}
+
+.container {
+    background-image: url("./assets/DataRobot-Mascot-Gray-Small.png"), url("./assets/DataRobot-Logo-Color-Small.jpg");
+    background-position: right 5%, left 95%;
+    background-repeat: no-repeat, no-repeat;
+    background-size: 60px 68px, 233px 32px;
+}
+
+.fa-times-circle {
+    visibility: hidden;
+}
+
+#help_b {
+    visibility: hidden;
+}
+
+h1 {
+    text-align: center;
+}
+
+h3 {
+    text-align: center;
+    color: #0090DC;
+}
+
+.controls::before {
+    content: '@2019 DataRobot, Inc. - All rights reserved   ';
+    color: gray
+}
