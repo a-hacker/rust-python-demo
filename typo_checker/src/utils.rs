@@ -1,6 +1,7 @@
 extern crate fst;
 extern crate fst_levenshtein;
 extern crate itertools;
+extern crate glob;
 
 use std::io::prelude::*;
 use std::io;
@@ -9,20 +10,24 @@ use std::path::PathBuf;
 use std::collections::HashMap;
 use fst::Set;
 use itertools::sorted;
+use glob::glob;
 
 pub fn create_fst_set(occurences: &HashMap<String, i32>) -> Result<Set, fst::Error> {
     Set::from_iter(sorted(occurences.keys()))
 }
 
-pub fn scan_dir(base_dir: PathBuf) -> Vec<PathBuf> {
-    if base_dir.is_dir() {
-        fs::read_dir(base_dir).unwrap().into_iter()
-            .map(|x| scan_dir(x.unwrap().path()))
-            .flatten()
-            .collect()
-    } else {
-        vec![base_dir]
-    }
+pub fn scan_dir(base_dir: &str) -> Vec<PathBuf> {
+    // if base_dir.is_dir() {
+    //     fs::read_dir(base_dir).unwrap().into_iter()
+    //         .map(|x| scan_dir(x.unwrap().path()))
+    //         .flatten()
+    //         .collect()
+    // } else {
+    //     vec![base_dir]
+    // }
+    glob(base_dir).expect("Could not read input string").into_iter()
+        .filter_map(Result::ok)
+        .collect()
 }
 
 pub fn count_words<'a>(file_path: PathBuf) -> Result<HashMap<String, i32>, io::Error> {

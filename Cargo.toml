@@ -2,5 +2,6 @@
 
 members = [
     "typo_checker",
-    "py_typos"
+    "py_typos",
+    "dr_demo"
 ]
