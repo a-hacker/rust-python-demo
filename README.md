@@ -63,6 +63,8 @@ make present
 
 will start a local Jupyter instance using your virtualenv, even if it not activated.
 
+You can also view the raw slides by opening python/Demo.slides.html in a browser. You will not be able to run the code from those slides though.
+
 ### Console
 
 If you instead prefer to run the code from a python repl in a terminal, you can run:
