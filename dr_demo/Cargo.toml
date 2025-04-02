@@ -9,5 +9,5 @@ name = "dr_demo"
 crate-type = ["cdylib"]
 
 [dependencies.pyo3]
-version = "0.8.0"
+version = "0.24.1"
 features = ["extension-module"]
