@@ -9,7 +9,7 @@ name = "py_typos"
 crate-type = ["cdylib"]
 
 [dependencies.pyo3]
-version = "0.8.0"
+version = "0.29.0"
 features = ["extension-module"]
 
 [dependencies]
